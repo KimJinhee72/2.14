@@ -33,7 +33,7 @@ window.addEventListener("load", function () {
     list.addEventListener("click" ,function(){
         list.classList.toggle("completed")
     })
-  });
+  });  
 //   전체삭제
 allClear.addEventListener("click" , function(){
     if(result.innerHTML === ""){
