@@ -38,5 +38,13 @@ window.addEventListener("load" , function(){
         descDelivery.textContent = `배송비 : ${element.getAttribute("data-delivery")}`
         descPoints.textContent = `적립금 : ${element.getAttribute("data-points")}`
         descRoasting.textContent = `로스팅  : ${element.getAttribute("data-roasting")}`
+        detailOrigin.textContent = `원산지 : ${element.getAttribute("data-origin")}`;
+        detailRegion.textContent = `지 역 : ${element.getAttribute("data-region")}`;
+        detailFarm.textContent = `농 장 : ${element.getAttribute("data-farm")}`;
+        detailAltitude.textContent = `고 도 : ${element.getAttribute("data-altitude")}`;
+        detailVariety.textContent = `품 종 : ${element.getAttribute("data-variety")}`;
+        detailProcess.textContent = `가공법 : ${element.getAttribute("data-process")}`;
+        flavorNote.textContent = `${element.getAttribute("data-flavornote")}`;
+        detailDescription.textContent = `${element.getAttribute("data-description")}`;
     }
 })
