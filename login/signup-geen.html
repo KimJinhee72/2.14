@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>회원가입</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f5f5f5;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      #singup-form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+      }
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+      button[type="submit"] {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      button[type="submit"]:hover {
+        background-color: #0157b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>회원가입</h1>
+      <form id="signup-form">
+        <label for="singupUsername">사용자 이름:</label>
+        <input type="text" id="signupUsername" name="signupUsername" required />
+        <br />
+        <label for="signup-password">비밀번호:</label>
+        <input type="password" name="signup-password" id="signup-password" />
+        <br />
+        <label for="signup-confirm-password">비밀번호 확인:</label>
+        <input type="password" name="signup-confirm-password" id="signup-confirm-password" />
+        <br />
+        <button type="submit">가입하기</button>
+      </form>
+    </div>
+    <script>
+      const signupForm = document.querySelector("#signup-form")
+      signupForm.addEventListener("submit" ,function(e){
+        e.preventDefault()
+        const userNameInput = document.getElementById("signupUsername") 
+        const passWordInput = document.getElementById("signup-password") 
+        const signupConfirmInput = document.getElementById("signup-confirm-password") 
+        const userName = userNameInput.value.trim()
+        const passWord = passWordInput.value.trim()
+        const signupConfirm = signupConfirmInput.value.trim()
+        const usernameRegex = /^[a-zA-Z0-9]+$/;
+        const passwordRegex = /.{6,}/;
+        if(!usernameRegex.test(userName)){
+          alert("사용자명은 영문자와 숫자로만 이루어져야 합니다");
+          return//조건부 종료: 특정 조건을 만족할 때 함수를 조기 종료,가독성 향상,오류 방지: 특정 조건을 만족할 때 즉시 반환
+          // 함수의 종료를 명확히 하고, 결과를 전달하는 중요한 역할
+        }
+        if(!passwordRegex.test(passWord)){
+          alert("비밀번호는 6자로 써야 합니다.");
+          return
+        }
+        if(passWord !== signupConfirm){
+          alert("비밀번호가 일치하지 않습니다. 다시 확인해 주세요~");          
+        }
+        const newUser = {
+          username : "userName",
+          password : "passWord"
+        }//if이후 추출해 newUser에 담음
+        const users = JSON.parse(localStorage.getItem("users")) || []
+        // localStorage내컴퓨터에 저장됨 , || []때문에 항상 유효한 배열이 저장됨
+        //JSON.parse는 서버에서 데이터를 가져와서 JavaScript에서 사용할 수 있도록 변환할 때
+        // console.log(users);
+        users.push(newUser)//users [기존내용]에 newUser내용을 추가하라
+        localStorage.setItem("users" , JSON.stringify(users))
+        //새로운 사용자 정보를 기존의 users 데이터와 함께 영구적으로 저장할 수 있다.
+        // F12 Application 안에 local storage의 html속 key user value안 가입자 내용저장됨.
+        signupForm.reset()//다 저장되었으니 reset함
+        alert("가입이 완료되었습니다. 로그인 페이지를 이동합니다.")
+        window.location.href = "login.html"
+      })
+    </script>
+  </body>
+</html>
