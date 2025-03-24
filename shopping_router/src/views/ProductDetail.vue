@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import Tab from "@/components/Tab.vue";
 const route = useRoute(); // useRoute()는 속성 정보 가져옴(params 등)
 const router = useRouter(); //라우트를 변경이동할 때 사용(push() , replace(), go())
 const goBack = () => {
@@ -172,6 +173,8 @@ const confirmBtn = ()=>{
       </div>
     </div>
   </div>
+  <!-- Tab -->
+  <Tab/>
 </template>
 <style scoped>
 .product-container {
