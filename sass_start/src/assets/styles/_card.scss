@@ -1,0 +1,12 @@
+@use "./variables" as *;
+// @import "./variables";
+.card {
+  max-width: 300px;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  padding: 16px;
+  background: white;
+  transition: all 0.3s;
+  cursor: pointer;
+  border: 1px solid #ddd;
+}

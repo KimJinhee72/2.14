@@ -1,0 +1,16 @@
+// @import "./variables";
+@use "./reset.css" as *;
+@use "./variables" as *;
+@use "./buttons" as *;
+@use "./card" as *;
+@use "./modal" as *;
+* {
+  // margin: 0;
+  // padding: 0;
+  box-sizing: border-box;
+}
+body {
+  height: 100%;
+  font-family: $font-family;
+  background-color: $primary-color;
+}
