@@ -2,53 +2,47 @@
   <div class="faq">
     <h2>자주 묻는 질문</h2>
     <div class="search-section">
+      <!--필터링-->
       <input
         type="text"
         v-model="searchQuery"
-        placeholder="검색어를 입력하세요."
- />
+        placeholder="검색어를 입력하세요"
+        @input="filterFAQs" />
     </div>
+
     <div class="faq-categories">
+      <!-- 클릭시 활성화를 위하여 :class="['category-btn'-클라스명 , {active : seletedCategory === category.id}]" -->
       <button
         v-for="category in categories"
         :key="category.id"
-        :class="['category-btn', { active: selectedCategory === category.id }]"
-        @click="selectedCategory1(category.id)">
+        :class="['category-btn', { active: seletedCategory === category.id }]"
+        @click="seletedCategory1(category.id)">
         {{ category.name }}
       </button>
     </div>
     <div class="faq-list">
-      <div v-for="faq in filterFAQs" :key="faq.id" class="faq-item">
-        <div class="faq-question" @click="toggleFAQ(faq.id)">
-          <h3>{{ faq.question }}</h3>
-          <span class="toggle-icon">{{
-            activeIndex === faq.id ? "▼" : "▶"
-          }}</span>
+        <div v-for="faq in faqs" :key="faq.id" class="faq-item" >
+            <div @click="toggleFAQ(faq.id)" class="faq-question">
+                <h3>{{ faq.question }}</h3>
+                <span class="toggle-icon">
+                    {{ activeIndex === faq.id ? "▼" : "▶" }}<!--isOpen 모두 false ▶-->
+                </span>
+            </div>
+            <div v-show="activeIndex === faq.id" class="faq-answer">
+                <p>{{faq.answer}}</p>
+            </div>
         </div>
-        <div class="faq-answer" v-show="activeIndex === faq.id">
-          <p>{{ faq.answer }}</p>
-        </div>
-      </div>
-    </div>
-    <div v-if="filterFAQs.length === 0" class="no-result">
-      검색 결과가 없습니다.
-    </div>
-    <div class="contact-section">
-      <p>원하는 답변을 찾지 못하셨나요?</p>
-      <router-link to="/contact" class="contact-btn">문의하기</router-link>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed } from "vue";
-const activeIndex = ref(null);
-// 검색어와 선택된 카테고리 상태 정의
-const searchQuery = ref("");
-const selectedCategory = ref("all");
-function selectedCategory1(categoryId) {
-  selectedCategory.value = categoryId;
-}
+import { ref , reactive } from "vue";
+const activeIndex = ref(null)
+// 검색어와 선택된 카테고리 상태 정의(전체를 메인으로)
+const searchQuery = ref(""); //처음 상태는 빈배열로
+const seletedCategory = ref("all");
+
 // 카테고리 목록 정의
 const categories = [
   { id: "all", name: "전체" },
@@ -57,6 +51,9 @@ const categories = [
   { id: "payment", name: "결제 관련" },
   { id: "cancellation", name: "취소/환불" },
 ];
+function seletedCategory1(categoryId){
+    seletedCategory.value = categoryId;
+}
 // FAQ 목록 정의
 const faqs = reactive([
   {
@@ -124,23 +121,15 @@ const faqs = reactive([
     isOpen: false,
   },
 ]); // reactive로 객체 배열 전체를 반응형으로 처리
-// 질문 열고 닫기 (아코디언 기능)
-function toggleFAQ(id) {
-  activeIndex.value = activeIndex.value === id ? null : id;
+// 질문 열고 닫기(토글기능만 만듦)
+//f는 {}임 어느 것을 클릭할지 몰라 담아놓고 씀 다음 if넣어 토글 기능만 만듦-> 내용 보이고는 따로 설정해야 함
+function toggleFAQ(id){
+    activeIndex.value = activeIndex.value === id ? null :IdleDeadline 
 }
-// 필터링된 FAQ (버튼 뭘설정할지)
-const filterFAQs = computed(() => {
-   //faq 하나하나 매개변수로 내가 잡음
-   return faqs.filter(
-    (faq) =>
-      (selectedCategory.value === "all" ||
-        faq.category === selectedCategory.value) &&
-      (faq.question.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        faq.answer.toLowerCase().includes(searchQuery.value.toLowerCase()))
-  );
-});
+const filterFAQs = ()=>{}
 </script>
-<style scoped>
+
+<style lang="scss" scoped>
 .faq {
   max-width: 800px;
   margin: 0 auto;
@@ -188,7 +177,6 @@ h2 {
   color: white;
   border-color: #4caf50;
 }
-
 .faq-list {
   display: flex;
   flex-direction: column;
@@ -232,49 +220,4 @@ h2 {
   color: #666;
 }
 
-.no-results {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.contact-section {
-  text-align: center;
-  margin-top: 3rem;
-  padding: 2rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.contact-section p {
-  margin-bottom: 1rem;
-  color: #666;
-}
-
-.contact-btn {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background: #4caf50;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
-
-.contact-btn:hover {
-  background: #45a049;
-}
-@media (max-width: 768px) {
-  .faq {
-    padding: 1rem;
-  }
-
-  .faq-categories {
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-  }
-}
 </style>
