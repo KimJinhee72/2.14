@@ -6,14 +6,16 @@ import FAQ from "@/views/FAQ.vue";
 import Myreservation from "@/views/Myreservation.vue";
 import ReservationForm from "@/views/ReservationForm.vue";
 import ServiceInfo from "@/views/ServiceInfo.vue"; 
+import ReservationStatus from "@/views/ReservationStatus.vue";
 const routes = [
     {path :"/",name:"Home", component : Home},
-    {path :"/login", component : Login },
-    {path :"/contact", component : Contact},
-    {path :"/faq", component : FAQ},
-    {path :"/myreservation", component : Myreservation},
-    {path :"/reservation", component : ReservationForm},
-    {path :"/serviceInfo", component : ServiceInfo},
+    {path :"/login", name:"Login", component : Login },
+    {path :"/contact", name:"Contact",component : Contact},
+    {path :"/faq", name:"FAQ",component : FAQ},
+    {path :"/myreservation", name:"Myreservation",component : Myreservation},
+    {path :"/reservation", name:"ReservationForm",component : ReservationForm},
+    {path :"/serviceInfo", name:"ServiceInfo",component : ServiceInfo},
+    {path :"/reservation-status" , name:"ReservationStatus",component : ReservationStatus}
 ]
 const router = createRouter({
     history: createWebHistory(),
