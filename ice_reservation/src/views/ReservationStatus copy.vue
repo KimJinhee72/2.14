@@ -6,75 +6,69 @@
       <div class="status-card">
         <div class="status-header">
           <h3>예약 정보</h3>
-          <span class="status-badge" :class="reservation.status">
-            {{ getStatusText(reservation.status) }}
-          </span>
+          <!--:class=reservation.status" 의 영어가 클라스 이름이됨 -->
+          <span class="status-badge"
+            :class="reservation.status"      
+          > {{getStatusText(reservation.status)}} </span>
         </div>
 
         <div class="status-content">
           <div class="info-grid">
             <div class="info-item">
               <label>예약 번호</label>
-              <p>{{ reservation.id }}</p>
+              <p>{{reservation.id}}</p>
             </div>
             <div class="info-item">
               <label>서비스 유형</label>
-              <p>{{ getServiceName(reservation.serviceType) }}</p>
+              <p>{{getServiceName(reservation.serviceType)}}</p>
             </div>
             <div class="info-item">
               <label>예약 날짜</label>
-              <p>{{ formatDate(reservation.date) }}</p>
+              <p>{{formatDate(reservation.date)}}</p>
             </div>
             <div class="info-item">
               <label>예약 시간</label>
-              <p>{{ reservation.time }}</p>
+              <p>{{reservation.time}}</p>
             </div>
             <div class="info-item">
               <label>주소</label>
-              <p>{{ reservation.address }}</p>
+              <p>{{reservation.address}}</p>
             </div>
             <div class="info-item">
               <label>상세주소</label>
-              <p>{{ reservation.detailAddress }}</p>
+              <p>{{reservation.detailAddress}}</p>
             </div>
           </div>
 
           <div class="notes-section">
             <label>추가 요청사항</label>
-            <p>{{ reservation.notes }}</p>
+            <p>{{reservation.notes}}</p>
           </div>
         </div>
       </div>
 
       <div class="process-flow">
         <h3>진행 상태</h3>
-        <div class="steps">
-          <div
-            v-for="step in processSteps"
-            :key="step.id"
-            :class="['step', { active: isStepActive(step.id) }]">
-            <div class="step-number">{{ step.id }}</div>
+        <div  class="steps">
+          <div v-for="step in processSteps" :key="step.id" 
+          :class="['step', {active:isStepActive(step.id)}]">
+            <div class="step-number">{{step.id}}</div>
             <div class="step-content">
-              <h4>{{ step.title }}</h4>
-              <p>{{ step.description }}</p>
+              <h4>{{step.title}}</h4>
+              <p>{{step.description}}</p>
             </div>
           </div>
         </div>
       </div>
-
       <div class="action-buttons">
-        <button class="modify-btn" @click="handleModify" :disabled="!canModify">
-          예약 수정
-        </button>
-        <button class="cancel-btn" @click="handleCancel" :disabled="!canCancel">
-          예약 취소
-        </button>
-        <button class="list-btn" @click="handleList">예약 목록</button>
+        <button class="modify-btn" @click="handleModify" :disabled="!canModify">예약 수정</button>
+        <button class="cancel-btn" @click="handleCancel" :disabled="!canCancel">예약 취소</button>
+        <button class="list-btn" @click="handlelist">예약 목록</button>
       </div>
     </div>
 
     <!-- 취소 확인 모달 -->
-    <div v-if="showCancelModal" class="modal">
+    <div v-if="showConfirmModal" class="modal">
       <div class="modal-content">
         <h3>예약 취소 확인</h3>
         <div class="modal-body">
@@ -82,12 +76,8 @@
           <p class="warning">취소 후에는 복구할 수 없습니다.</p>
         </div>
         <div class="modal-actions">
-          <button class="cancel-btn" @click="showCancelModal = false">
-            아니오
-          </button>
-          <button class="confirm-btn" @click="confirmCansel">
-            예, 취소합니다
-          </button>
+          <button class="cancel-btn" @click="showConfirmModal">아니오</button>
+          <button class="confirm-btn" @click="confirmCancel">예, 취소합니다</button>
         </div>
       </div>
     </div>
@@ -96,11 +86,10 @@
 
 <script setup>
 import router from "@/router";
-import { ref, computed } from "vue";
-// import { useRouter } from "vue-router";
-// const router = useRouter();
-// 모달 확인
-const showCancelModal = ref(false);
+import { computed, ref } from "vue";
+
+const showConfirmModal = ref(false);
+
 // 예약 정보 객체 선언
 const reservation = ref({
   id: "RES-2024-001", // 예약 번호
@@ -113,6 +102,24 @@ const reservation = ref({
   status: "upcoming", // 상태: upcoming | in_progress | completed | cancelled
 });
 console.log("예약 정보:", reservation.value);
+// 서비스 코드 → 서비스명 변환
+const getServiceName = (id) => {
+  const serviceMap = {
+    basic: "기본 청소",
+    deep: "심층 청소",
+    premium: "프리미엄 청소",
+  };
+  // status 값을 사람이 보기 쉬운 텍스트로 변환
+  const name = serviceMap[id] || id;
+  console.log("서비스명:", name);
+  return name;
+};
+// 날짜를 YYYY-MM-DD → YYYY. MM. DD. 형식으로 변환
+const formatDate = (date) => {
+  const formatted = new Date(date).toLocaleDateString("ko-KR");
+  console.log("포맷된 날짜:", formatted);
+  return formatted;
+};
 
 // 진행 단계 배열 (진행 순서)
 const processSteps = ref([
@@ -137,8 +144,20 @@ const processSteps = ref([
     description: "청소가 완료되었습니다.",
   },
 ]);
-// 상태 코드 => 텍스트 변환
-const getStatusText = (status) => {
+// 현재진행중인 단계인지 여부
+const isStepActive = (stepId)=>{
+  // console.log(stepId);
+  const statusMap = {
+    upcoming: 1,//지금 상태라  1번이 보임
+    in_progress: 2,
+    inspection: 3,
+    completed: 4,
+  }
+  const active = statusMap[reservation.value.status] === stepId
+  return active //return해 active를 출력하겠다
+}
+// 상태코드(진행중등)=>한글로
+const getStatusText = (status)=>{
   // console.log(status);
   const statusMap = {
     upcoming: "예정",
@@ -146,66 +165,46 @@ const getStatusText = (status) => {
     completed: "완료",
     cancelled: "취소",
   };
-  const text = statusMap[status] || status;
-  return text;
-};
-// 예약 취소가능 여부 : 상태가 "upcoming" 일때만 가능
-const canCancel = computed(() => {
-  const result = reservation.value.status === "upcoming";
-  return result;
-});
-// 날짜를 YYYY-MM-DD → YYYY. MM. DD. 형식으로 변환
-const formatDate = (date) => {
-  const formatted = new Date(date).toLocaleDateString("ko-KR");
-  console.log("포맷된 날짜:", formatted);
-  return formatted;
-};
-// 서비스 코드 → 서비스명 변환
-const getServiceName = (id) => {
-  const serviceMap = {
-    basic: "기본 청소",
-    deep: "심층 청소",
-    premium: "프리미엄 청소",
-  };
-  // status 값을 사람이 보기 쉬운 텍스트로 변환
-  const name = serviceMap[id] || id;
-  console.log("서비스명:", name);
-  return name;
-};
-// 현재 진행 중인 단계인지 여부
-const isStepActive = (stepId) => {
-  const statusMap = {
-    upcoming: 1,
-    in_progress: 2,
-    inspection: 3,
-    completed: 4,
-  };
-  const active = statusMap[reservation.value.status] === stepId;
-  return active;
-};
-// 예약 수정하기 클릭시이동
-const handleModify = () => {
-  router.push(`/modify-reservation/${reservation.value.id}`);
-};
-//예약 수정가능 여부 : 상태가 "upcoming" 일때만 가능
-const canModify = computed(() => {
-  const result = reservation.value.status === "upcoming";
-  return result;
-});
-// 예약 취소 버튼 클릭시 - 모달표시
-const handleCancel = () => {
-  showCancelModal.value = true;
-};
-// 예약 취소 확성 => 상태변경
-const confirmCansel = () => {
-  reservation.value.status = "cancelled";
-  showCancelModal.value = false;
-};
-// 예약목록 페이지 이동
-const handleList = () => {
-  router.push("/myreservation");
-};
-</script>
+  const text = statusMap[status] || status // 상태를 표시함
+  return text
+}
+// 예약 수정 클릭시 수정 페이지로 이동
+const handleModify = ()=>{
+  router.push(`/modify-reservation/${reservation.value.id}`)
+}
+// 예약 수정가능 여부 : 상태가 upcoming 일때만 가능
+const canModify = computed(()=>{
+  const result = reservation.value.status === "upcoming"
+  return result
+})
+// 예약 취소 버튼 클릭시 -모달표시
+const handleCancel = ()=>{
+  showConfirmModal.value = true  
+}
+//예약취소도: 상태가 upcoming 일때만 가능
+const canCancel = computed(()=>{
+  const result = reservation.value.status === "upcoming"
+  return result
+})
+// 모달창 팝업후 아니오
+
+// 모달창 팝업후 예 (예약 취소 확정 상태변경)
+const confirmCancel = ()=>{
+  reservation.value.status = "cancelled" //이부분의 상태를 만들어 줘야함
+  showConfirmModal.value = false
+  const confirmResult =confirm(" 정말로 취소하겠습니까?")
+  if (confirmResult) {
+    reservation.value.status = "cancelled"
+    showConfirmModal.value = false
+    // router.push('/reservation') // 라우터 이동 필요시
+  }
+}
+// 예약목록페이지 이동
+const handlelist = ()=>{
+  router.push('/myreservation')
+}
+
+</script >
 
 <style scoped>
 .reservation-status {
@@ -323,6 +322,10 @@ h3 {
 }
 
 .step.active {
+  opacity: 1;
+}
+
+.step.completed {
   opacity: 1;
 }
 

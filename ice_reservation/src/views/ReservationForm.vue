@@ -247,7 +247,7 @@ const handleSubmit = () => {
 };
 // 예약확인 처리가능 - 예약상태관리 페이지이동
 const confirmReservation = () => {
-  router.push("/reservation-status");
+  router.push("/reservation-status/1");//1 id 값 설정, 현장은 변수로 담아서 만들어 사용
 };
 </script>
 <style scoped>
