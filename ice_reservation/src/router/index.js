@@ -8,9 +8,13 @@ import ReservationForm from "@/views/ReservationForm.vue";
 import ServiceInfo from "@/views/ServiceInfo.vue"; 
 import ReservationStatus from "@/views/ReservationStatus.vue";
 import ModifyReservation from "@/views/ModifyReservation.vue";
+import SignUp from "@/views/SignUp.vue";
+import UserProflie from "@/views/UserProflie.vue";
+import FindPassword from "@/views/FindPassword.vue";
 const routes = [
     {path :"/",name:"Home", component : Home},
     {path :"/login", name:"Login", component : Login },
+    {path :"/signUp" , name:"SignUp" , component :SignUp, props: true,},
     {path :"/contact", name:"Contact",component : Contact},
     {path :"/faq", name:"FAQ",component : FAQ},
     {path :"/myreservation", name:"Myreservation",component : Myreservation},
@@ -18,7 +22,9 @@ const routes = [
     {path :"/serviceInfo", name:"ServiceInfo",component : ServiceInfo},
     {path :"/reservation-status/:id" , name:"ReservationStatus",component : ReservationStatus},
     // /reservation-status/:id 의 :id 를 속성을 만들어줌 값을 넣어주려고 
-    {path :"/modify-reservation/:id" , name:"ModifyReservation" , component :ModifyReservation, props: true,}
+    {path :"/modify-reservation/:id" , name:"ModifyReservation" , component :ModifyReservation, props: true,},
+    {path :"/profile" , name:"UserProflie" , component :UserProflie, props: true,},
+    {path :"/find-password" , name:"FindPassword" , component :FindPassword, props: true,},
 ]
 const router = createRouter({
     history: createWebHistory(),
