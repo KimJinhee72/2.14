@@ -8,12 +8,19 @@ export const useAuthStore = defineStore("auth", {
     // 로컬스토리지에 저장된 로그인 상태를 불러와 초기값으로 사용
     isLoggedIn: localStorage.getItem("isLoggedIn") === "true",
 
-    // 저장된 사용자 이름 또는 기본값 '' 
+    // 저장된 사용자 이름 또는 기본값 ''
     // Pinia에서 userName으로 자동 저장
     userName: localStorage.getItem("userName") || "",
 
     // 저장된 이메일 또는 기본값 ''
     userEmail: localStorage.getItem("userEmail") || "",
+    // 주소
+    userAddress: localStorage.getItem("userAddress") || "",
+    userDetailAddress: localStorage.getItem("userDetailAddress") || "",
+    // 전화번호
+    userPhone: localStorage.getItem("userPhone") || "",
+    // 가입날짜
+    userCreatedAt: localStorage.getItem("userCreatedAt") || "",
   }),
 
   // 계산된 값(getters): 상태를 기반으로 값을 가공하여 제공
@@ -23,6 +30,11 @@ export const useAuthStore = defineStore("auth", {
 
     // 로그인 여부 반환
     getIsLoggedIn: (state) => state.isLoggedIn,
+    getUserEmail: (state) => state.userEmail,
+    getUserPhone: (state) => state.userPhone,
+    getUserAddress: (state) => state.userAddress,
+    getUserDetailAddress: (state) => state.userDetailAddress,
+    getUserCreatedAt: (state) => state.userCreatedAt,
   },
 
   // 상태를 변경하는 메서드 정의
@@ -41,12 +53,19 @@ export const useAuthStore = defineStore("auth", {
 
       // 이메일 저장
       this.userEmail = userData.email;
+      this.userPhone = userData.phone || "";
+      this.userAddress = userData.address || "";
+      this.userDetailAddress = userData.detailAddress || "";
+      this.userCreatedAt = userData.createdAt || "";
 
-      // 로컬스토리지에 로그인 정보 저장
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userName", this.userName);
-      localStorage.setItem("userEmail", this.userEmail);
-      console.log(userData);
+       // 로컬스토리지에 로그인 정보 저장
+       localStorage.setItem("isLoggedIn", "true");
+       localStorage.setItem("userName", this.userName);
+       localStorage.setItem("userEmail", this.userEmail);
+       localStorage.setItem("userAddress", this.userAddress);
+       localStorage.setItem("userPhone", this.userPhone);
+       localStorage.setItem("userDetailAddress", this.userDetailAddress);
+       localStorage.setItem("userCreatedAt", this.userCreatedAt);
     },
 
     // 로그아웃 처리 메서드
@@ -55,11 +74,24 @@ export const useAuthStore = defineStore("auth", {
       this.isLoggedIn = false;
       this.userName = "";
       this.userEmail = "";
+      this.userId = null;
+      this.userPhone = "";
+      this.userAddress = "";
+      this.userDetailAddress = "";
+      this.userCreatedAt = "";
 
       // 로컬스토리지에서도 삭제
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("userName");
       localStorage.removeItem("userEmail");
     },
+    // 프로필 업데이트
+    updateProfile(profileData){
+      console.log(profileData);
+      this.userName = profileData.name
+      this.userPhone = profileData.phone
+      this.userAddress = profileData.address
+      this.userDetailAddress = profileData.detailAddress
+    }
   },
 });

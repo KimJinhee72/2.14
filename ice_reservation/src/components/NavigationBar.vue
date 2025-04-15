@@ -4,15 +4,19 @@
       <router-link to="/" class="logo">제빙기 청소</router-link>
       <!-- 모바일 -->
       <div class="mobile-wrap">
-        <div class="hamburger-menu">
+        <div
+          class="hamburger-menu"
+          @click="toggleMenu"
+          :class="{ active: isMenuOpen }">
           <span></span>
           <span></span>
           <span></span>
         </div>
-        <div class="nav-links">
+        <div class="nav-links" :class="{ open: isMenuOpen }">
           <router-link to="/reservation">예약하기</router-link>
-          <router-link to="/myreservation">나의 예약</router-link>
-          <router-link to="/serviceInfo">서비스 안내</router-link>
+          <router-link to="/login" v-if="!isLoggedIn">나의 예약</router-link>
+          <router-link to="/my-reservations" v-else>나의 예약</router-link>
+          <router-link to="/seviceInfo">서비스 안내</router-link>
           <router-link to="/faq">FAQ</router-link>
           <router-link to="/contact">문의하기</router-link>
         </div>
@@ -22,7 +26,7 @@
             <span class="user-name">{{ userName }}</span>
             <div class="dropdown-content">
               <router-link to="/profile">마이페이지</router-link>
-              <router-link to="/myreservation">예약내역</router-link>
+              <router-link to="/my-reservations">예약내역</router-link>
               <a @click="logout"> 로그아웃</a>
             </div>
           </div>
@@ -35,9 +39,14 @@
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { storeToRefs } from "pinia";
+import { ref } from "vue";
 const router = useRouter();
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+};
 const authStore = useAuthStore();
 const { isLoggedIn, userName } = storeToRefs(authStore);
+const isMenuOpen = ref(false);
 const logout = () => {
   authStore.logout();
   router.push("/");
@@ -132,5 +141,25 @@ const logout = () => {
 
 .dropdown-content a:hover {
   background-color: #f5f5f5;
+}
+@media screen and (max-width: 768px) {
+  .hamburger-menu {
+    display: flex;
+  }
+  .nav-links {
+    display: none;
+   
+  }
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    border-radius: 4px;
+  }
 }
 </style>
