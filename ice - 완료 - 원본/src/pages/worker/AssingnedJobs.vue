@@ -1,0 +1,1 @@
+<template>배정된예약</template>

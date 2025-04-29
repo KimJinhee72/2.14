@@ -1,0 +1,1 @@
+<template>기사페이지</template>
