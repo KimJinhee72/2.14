@@ -28,7 +28,7 @@
       </div>
     </div>
     <!-- 메인컨텐츠 -->
-    <div class="ml-64 min-h-screen">
+    <div class="md:ml-64 ml-0 min-h-screen">
       <div class="p-8">
         <p v-if="isLoggedIn">🛠{{userName}}기사님</p>
         <div class="driver-container">
@@ -67,3 +67,22 @@ const logout = ()=>{
     router.push("/")
 }
 </script>
+<style scoped>
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+   .fixed{
+    position: relative;
+    width: 100%;
+    height: auto;
+   .ml-64{
+    margin-left: 0;
+   } 
+   .w-64 {
+    width: 100%;
+  }
+   .p-8{
+    padding: 1rem;
+   } 
+   } 
+}
+</style>

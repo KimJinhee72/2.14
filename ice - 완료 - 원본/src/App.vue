@@ -37,7 +37,7 @@ const isSpecialPage = computed(() => {
 }
 
 .content {
-  max-width: 1200px;
+
   margin: 0 auto;
   padding: 6rem 2rem 2rem;
 }

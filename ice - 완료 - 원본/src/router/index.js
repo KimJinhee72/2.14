@@ -18,6 +18,15 @@ import AssingnedJobs from "@/pages/worker/AssingnedJobs.vue";
 import Assing from "@/pages/worker/Assing.vue";
 import Profile from "@/pages/worker/Profile.vue";
 import Jobhistory from "@/pages/worker/Jobhistory.vue";
+// 관리자페이지
+import LoginAdmin from "@/views/LoginAdmin.vue";
+import AdminHome from "@/pages/admin/AdminHome.vue";
+import Dashboard from "@/pages/admin/Dashboard.vue";
+import WorkerHomeCopy from "@/pages/worker/WorkerHomecopy.vue";
+import Customers from "@/pages/admin/Customers.vue";
+import Settings from "@/pages/admin/Settings.vue";
+import Workers from "@/pages/admin/Workers.vue";
+import Reservations from "@/pages/admin/Reservations.vue";
 const routes = [
   { path: "/", name: "Home", component: Home },
   { path: "/contact", name: "Contact", component: Contact },
@@ -78,6 +87,45 @@ const routes = [
         component: Profile,
       },
     ],
+  },
+  // 관리자페이지
+  {
+    path: "/admin",
+    name: "LoginAdmin",
+    component: LoginAdmin,
+  },
+  {
+    path: "/workerhomecopy",
+    name: "workerhomecopy",
+    component: WorkerHomeCopy,
+  },
+  // 관리자 로그인 후
+  {
+    path: "/admin",
+    component: AdminHome,
+    redirect: "/admin/dashboard",
+    children:[
+      {
+        path: "dashboard",
+        component: Dashboard,
+      },
+      {
+        path: "customers",
+        component: Customers,
+      },
+      {
+        path: "settings",
+        component: Settings,
+      },
+      {
+        path: "workers",
+        component: Workers,
+      },
+      {
+        path: "reservations",
+        component: Reservations,
+      },
+    ]
   },
 ];
 
