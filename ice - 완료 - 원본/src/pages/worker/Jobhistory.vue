@@ -33,7 +33,7 @@
       <!-- 통계 카드 -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <div
-          class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-4 md:p-6">
+          class="flex items-center gap-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-4 md:p-6">
           <div class="flex items-center gap-4">
             <div
               class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
@@ -47,7 +47,7 @@
           </div>
         </div>
         <div
-          class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-4 md:p-6">
+          class="flex items-center gap-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-4 md:p-6">
           <div class="flex items-center gap-4">
             <div
               class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
@@ -60,7 +60,7 @@
           </div>
         </div>
         <div
-          class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-4 md:p-6">
+          class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-4 p-4 md:p-6">
           <div class="flex items-center gap-4">
             <div
               class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
@@ -88,7 +88,7 @@
           </div>
         </div>
         <div
-          class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-4 md:p-6">
+          class="bg-white flex items-center gap-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-4 md:p-6">
           <div class="flex items-center gap-4">
             <div
               class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
@@ -517,7 +517,7 @@
     let result = [...jobHistory.value];
     // 검색어 필터링
     if (searchQuery.value) {
-      const query = searchQuery.vlaue.toLowerCase();
+      const query = searchQuery.value.toLowerCase();
       result = result.filter(
         (job) =>
           job.customer.toLowerCase().includes(query) ||
