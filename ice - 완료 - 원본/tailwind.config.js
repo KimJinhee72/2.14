@@ -18,5 +18,6 @@ export default {
       },
     },
   },
+  darkMode:"class",//다크모드속성을 클라스로 컨트롤하겠다.
   plugins: [],
 };

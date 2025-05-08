@@ -59,7 +59,7 @@ const initMap = () => {
     };
     // 사용자 이미지 마커 설정
     const markerImage = new kakao.maps.MarkerImage(
-      "/public/images/가방도 캐릭터 작업 모음.gif", // 이미지 URL
+      "/images/가방도 캐릭터 작업 모음.gif", // 이미지 URL
       new kakao.maps.Size(64, 64), // 마커 이미지 크기
     //   { offset: new kakao.maps.Point(32, 64) } // 마커 위치 조정
     );
@@ -80,25 +80,29 @@ const initMap = () => {
 // 카카오 지도 스크립트 로드
 const loadKakaoMap = () => {
   const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_KEY;
-  // API키 설정 여부 확인
+
   if (!kakaoApiKey) {
     console.error("카카오 API키가 설정되지 않았습니다.");
     return;
   }
+
   const scriptId = "kakao-map-script";
   if (!document.getElementById(scriptId)) {
     const script = document.createElement("script");
     script.id = scriptId;
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoApiKey}&autoload=false&libraries=services`;
     script.onload = () => {
-      kakao.maps.load(initMap); // kakao 지도 API초기화
-      console.log("카카오 지도 API로드 완료"); //스크립트 로드 확인
-      initMap();
+      window.kakao.maps.load(() => {
+        console.log("카카오 지도 API 로드 완료");
+        initMap(); // ✅ 여기서만 호출
+      });
     };
     document.head.appendChild(script);
   } else {
     console.log("카카오 지도 API 스크립트가 이미 로드됨");
-    window.kakao.maps.load(initMap);
+    window.kakao.maps.load(() => {
+      initMap();
+    });
   }
 };
 onMounted(loadKakaoMap);
