@@ -192,10 +192,13 @@
               <td
                 class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button
-                  class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-3">
+                  class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-3"
+                  @click="showReservationDetails(reservation)">
                   <i class="fas fa-eye mr-1"></i>상세
                 </button>
                 <button
+                  v-if="reservation.status !== 'cancelled'"
+                  @click="comfirmCancle(reservation)"
                   class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
                   <i class="fas fa-ban mr-1"></i>취소
                 </button>
@@ -212,7 +215,6 @@
       <div class="text-sm text-gray-700 dark:text-gray-300">
         총 <span class="font-medium">{{ filteredReservations.length }}</span
         >건의 예약
-        <!-- reservations가 담겨있는 filteredReservations의 길이로 총예약 -->
       </div>
       <div class="flex gap-2">
         <button
@@ -223,8 +225,8 @@
         </button>
         <button
           v-for="page in totalPages"
-          :key="page"
-          @click="gotoPage(page)"
+          key="page"
+          @click="goToPage(page)"
           :class="[
             'px-3 py-1 border rounded',
             currentPage === page
@@ -233,7 +235,6 @@
           ]">
           {{ page }}
         </button>
-        <!-- "currentPage === totalPages" totalPages한 이유는 몇개일지 모르니-->
         <button
           @click="nextPage"
           :disabled="currentPage === totalPages"
@@ -256,6 +257,7 @@
               예약 상세 정보
             </h3>
             <button
+              @click="closeModal"
               class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
               <i class="fas fa-times"></i>
             </button>
@@ -277,8 +279,8 @@
                       >예약번호</label
                     >
                     <span class="text-sm text-gray-900 dark:text-white"
-                      >#{{
-                    }}</span>
+                      >#{{ selectedReservation.id }}</span
+                    >
                   </div>
                   <div class="flex items-center">
                     <label
@@ -286,8 +288,9 @@
                       >상태</label
                     >
                     <span
+                      :class="getStatusClass(selectedReservation.status)"
                       class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
-                      {{}}
+                      {{ getStatusText(selectedReservation.status) }}
                     </span>
                   </div>
                   <div class="flex items-center">
@@ -295,9 +298,8 @@
                       class="w-32 text-sm font-medium text-gray-700 dark:text-gray-300"
                       >카페명</label
                     >
-                    <span
-                      class="text-sm text-gray-900 dark:text-white"
-                      >{{
+                    <span class="text-sm text-gray-900 dark:text-white">{{
+                      selectedReservation.cafeName
                     }}</span>
                   </div>
                   <div class="flex items-center">
@@ -305,9 +307,8 @@
                       class="w-32 text-sm font-medium text-gray-700 dark:text-gray-300"
                       >사업자등록번호</label
                     >
-                    <span
-                      class="text-sm text-gray-900 dark:text-white"
-                      >{{
+                    <span class="text-sm text-gray-900 dark:text-white">{{
+                      selectedReservation.businessNumber
                     }}</span>
                   </div>
                   <div class="flex items-center">
@@ -315,9 +316,8 @@
                       class="w-32 text-sm font-medium text-gray-700 dark:text-gray-300"
                       >회원명</label
                     >
-                    <span
-                      class="text-sm text-gray-900 dark:text-white"
-                      >{{
+                    <span class="text-sm text-gray-900 dark:text-white">{{
+                      selectedReservation.user
                     }}</span>
                   </div>
                   <div class="flex items-center">
@@ -325,9 +325,8 @@
                       class="w-32 text-sm font-medium text-gray-700 dark:text-gray-300"
                       >연락처</label
                     >
-                    <span
-                      class="text-sm text-gray-900 dark:text-white"
-                      >{{
+                    <span class="text-sm text-gray-900 dark:text-white">{{
+                      selectedReservation.phone
                     }}</span>
                   </div>
                   <div class="flex items-center">
@@ -335,9 +334,8 @@
                       class="w-32 text-sm font-medium text-gray-700 dark:text-gray-300"
                       >이메일</label
                     >
-                    <span
-                      class="text-sm text-gray-900 dark:text-white"
-                      >{{
+                    <span class="text-sm text-gray-900 dark:text-white">{{
+                      selectedReservation.email
                     }}</span>
                   </div>
                 </div>
@@ -355,9 +353,8 @@
                       class="w-32 text-sm font-medium text-gray-700 dark:text-gray-300"
                       >모델명</label
                     >
-                    <span
-                      class="text-sm text-gray-900 dark:text-white"
-                      >{{
+                    <span class="text-sm text-gray-900 dark:text-white">{{
+                      selectedReservation.modelName
                     }}</span>
                   </div>
                   <div class="flex items-center">
@@ -366,7 +363,7 @@
                       >견적금액</label
                     >
                     <span class="text-sm text-gray-900 dark:text-white"
-                      >{{}}원</span
+                      >{{ selectedReservation.estimatedPrice }}원</span
                     >
                   </div>
                   <div class="space-y-2">
@@ -375,8 +372,13 @@
                       >제빙기 사진</label
                     >
                     <div class="grid grid-cols-3 gap-2">
-                      <div class="relative">
-                        <img class="w-full h-32 object-cover rounded-md" />
+                      <div
+                        class="relative"
+                        v-for="(photo, index) in selectedReservation.photos"
+                        :key="index">
+                        <img
+                          :src="photo"
+                          class="w-full h-32 object-cover rounded-md" />
                       </div>
                     </div>
                   </div>
@@ -397,9 +399,8 @@
                       class="w-32 text-sm font-medium text-gray-700 dark:text-gray-300"
                       >접수일시</label
                     >
-                    <span
-                      class="text-sm text-gray-900 dark:text-white"
-                      >{{
+                    <span class="text-sm text-gray-900 dark:text-white">{{
+                      formatDate(selectedReservation.createdAt)
                     }}</span>
                   </div>
                   <div class="flex items-center">
@@ -407,9 +408,8 @@
                       class="w-32 text-sm font-medium text-gray-700 dark:text-gray-300"
                       >희망일시</label
                     >
-                    <span
-                      class="text-sm text-gray-900 dark:text-white"
-                      >{{
+                    <span class="text-sm text-gray-900 dark:text-white">{{
+                      formatDate(selectedReservation.preferredDateTime)
                     }}</span>
                   </div>
                 </div>
@@ -431,6 +431,8 @@
                       <input
                         type="text"
                         readonly
+                        v-model="technicianSearch"
+                        @click="openTechnicianSearchModal"
                         placeholder="기사 검색"
                         class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
                       <i
@@ -452,7 +454,7 @@
                       >요구사항</label
                     >
                     <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                      {{}}
+                      {{ selectedReservation.requirements }}
                     </p>
                   </div>
                   <div>
@@ -461,7 +463,7 @@
                       >특별 요청사항</label
                     >
                     <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                      {{}}
+                      {{ selectedReservation.specialRequests }}
                     </p>
                   </div>
                   <div>
@@ -470,7 +472,7 @@
                       >메모</label
                     >
                     <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                      {{}}
+                      {{ selectedReservation.memo }}
                     </p>
                   </div>
                 </div>
@@ -481,10 +483,12 @@
         <div
           class="px-6 py-4 bg-gray-50 dark:bg-gray-700 flex justify-end space-x-3">
           <button
+            @click="closeModal"
             class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
             닫기
           </button>
           <button
+            @click="saveTechnicianAssignment"
             class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
             기사 배정 저장
           </button>
@@ -500,7 +504,9 @@
         <div class="p-6 border-b border-gray-200">
           <div class="flex justify-between items-center">
             <h3 class="text-lg font-medium text-gray-900">예약 취소 확인</h3>
-            <button class="text-gray-400 hover:text-gray-500">
+            <button
+              @click="closeCancelModal"
+              class="text-gray-400 hover:text-gray-500">
               <i class="fas fa-times"></i>
             </button>
           </div>
@@ -515,10 +521,12 @@
         </div>
         <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
           <button
+            @click="closeCancelModal"
             class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
             아니오
           </button>
           <button
+            @click="cancelReservation"
             class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700">
             예, 취소합니다
           </button>
@@ -536,7 +544,9 @@
         <div class="p-6 border-b border-gray-200">
           <div class="flex justify-between items-center">
             <h3 class="text-lg font-medium text-gray-900">기사 검색</h3>
-            <button class="text-gray-400 hover:text-gray-500">
+            <button
+              class="text-gray-400 hover:text-gray-500"
+              @click="closeTechnicianSearchModal">
               <i class="fas fa-times"></i>
             </button>
           </div>
@@ -549,6 +559,7 @@
                 >구분</label
               >
               <select
+                v-model="technicianSearchFilter.type"
                 class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="all">전체</option>
                 <option value="executive">임원</option>
@@ -560,6 +571,7 @@
                 >정산율</label
               >
               <select
+                v-model="technicianSearchFilter.settlementRate"
                 class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="all">전체</option>
                 <option value="70">70%</option>
@@ -574,6 +586,7 @@
                 >활동지역</label
               >
               <select
+                v-model="technicianSearchFilter.area"
                 class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="all">전체</option>
                 <option value="seoul">서울</option>
@@ -588,6 +601,8 @@
           <div class="mb-6">
             <div class="relative">
               <input
+                v-model="technicianSearchFilter.keyword"
+                @input="handleInput1"
                 type="text"
                 placeholder="기사명 또는 전화번호로 검색"
                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
@@ -630,28 +645,33 @@
                   </th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody
+                v-for="tech in paginatedTechnicians"
+                :key="tech.id"
+                class="bg-white divide-y divide-gray-200">
                 <tr class="hover:bg-gray-50">
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{}}
+                    {{ tech.id }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{}}
+                    {{ tech.name }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{}}
+                    {{ getTechnicianTypeText(tech.type) }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{}}
+                    {{ tech.phone }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{}}%
+                    {{ tech.settlementRate }}%
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{}}
+                    {{ getAreaText(tech.area) }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button class="text-indigo-600 hover:text-indigo-900">
+                    <button
+                      @click="selectTechnician(tech)"
+                      class="text-indigo-600 hover:text-indigo-900">
                       선택
                     </button>
                   </td>
@@ -664,15 +684,29 @@
           <div class="flex justify-between items-center mt-6">
             <div class="text-sm text-gray-700">
               총
-              <span class="font-medium">{{}}</span>명의 기사
+              <span class="font-medium">{{ filteredTechnicians.length }}</span
+              >명의 기사
             </div>
             <div class="flex gap-2">
               <button
+                :disabled="currentTechnicianPage === 1"
                 class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <i class="fas fa-chevron-left"></i>
               </button>
-              <button>{{}}</button>
               <button
+                v-for="page in totalPages"
+                :key="page"
+                @click="gotoTechnicianPage(page)"
+                :class="[
+                  'px-3 py-1 border rounded',
+                  currentTechnicianPage === page
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'border-gray-300 hover:bg-gray-50',
+                ]">
+                {{ page }}
+              </button>
+              <button
+                :disabled="currentTechnicianPage === totalTechnicianPages"
                 class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <i class="fas fa-chevron-right"></i>
               </button>
@@ -691,7 +725,7 @@ const showTechnicianSearchModal = ref(false);
 const selectedReservation = ref(null);
 const showCancelModal = ref(false);
 const statusFilter = ref("all");
-const sortBy = ref("date-desc"); //날짜 필터링의
+const sortBy = ref("date-desc");
 // 한글이슈
 function handleInput(event) {
   searchQuery.value = event.target.value; //입력된 값을 searchQuery에 반영
@@ -710,6 +744,7 @@ const reservations = ref([
     email: "kim@example.com",
     status: "confirmed",
     specialRequests: "창가 자리로 부탁드립니다.",
+    cafeName: "Hcoffee",
   },
   {
     id: 2,
@@ -828,27 +863,41 @@ const filteredReservations = computed(() => {
     const query = searchQuery.value.toLowerCase();
     result = result.filter(
       (r) =>
-        r.user.toLowerCase().includes(query) || r.id.toString().includes(query)
+        r.user.toLowerCase().includes(query) || r.id.toString().includes(query) //숫자를 문자열로 바꿈
     );
   }
   // 상태필터링
   if (statusFilter.value !== "all") {
-    //날짜 오름차순 정렬(예 오래된순 => 최신순)
     result = result.filter((r) => r.status === statusFilter.value);
   }
   // 정렬 필터링
-  // 정렬기준(sortBy.value)에 따라 결과를 정렬
+  // 정렬 기준(sortBy.vlaue)에 따라 결과를 정렬
   switch (sortBy.value) {
-    // 날짜 오름순 정렬(오랜순 부터)
+    // 날짜 오름순 정렬(예:오래된 순 => 최신순)
     case "date-asc":
-      result.sort((a, b) => new Date(a.date) - new Date(b.date));
-      break
-    // 날짜 내림차순 정렬(최신순 부터)
+      // sort()배열을 정렬함수
+      result.sort((a, b) => {
+        // console.log("비교중 (오름차순):");
+        // console.log("a:", a);
+        // console.log("b:", b);
+        return new Date(a.date) - new Date(b.date);
+      });
+      break;
     case "date-desc":
-      result.sort((a, b) => new Date(b.date) - new Date(a.date));
-      break
+      // sort()배열을 정렬함수
+      result.sort((a, b) => {
+        // console.log("비교중 (내림차순):");
+        // console.log("a:", a);
+        // console.log("b:", b);
+        return new Date(b.date) - new Date(a.date);
+      });
+      break;
+    // 이름 오름차순 정렬(예 :가나다 순)
+    case "name-asc":
+      // localeCompare()는 문자열을 알파벳이나 한글 순서레 따라 정렬할때 사용
+      result.sort((a, b) => a.user.localeCompare(b.user)); //문자열 비교
+      break;
   }
-
   return result;
 });
 // 페이지네이션 기능
@@ -864,20 +913,20 @@ const paginatedReservations = computed(() => {
   const end = start + itemsPerPage.value;
   return filteredReservations.value.slice(start, end);
 });
-// 이전페이지
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-  }
-};
 // 다음페이지
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
   }
 };
-// 클릭시(페이지숫자) 해당페이지로 이동
-const gotoPage = (page) => {
+// 이전페이지
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+// 해당하는 페이지이동
+const goToPage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
   }
@@ -900,7 +949,7 @@ const getStatusText = (status) => {
   };
   return statusMap[status] || status;
 };
-// 상태 클라스 적용
+// 상태 클래스 적용
 const getStatusClass = (status) => {
   const statusClasses = {
     confirmed:
@@ -914,5 +963,279 @@ const getStatusClass = (status) => {
     "bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-300"
   );
 };
+
+// 상세내용
+
+const showReservationDetails = (reservation) => {
+  selectedReservation.value = {
+    ...reservation, //기존 예약 데이터를 모두 복사
+    // 카페이름이 없으면 "카페명 미입력" 으로 설정
+    // 카페 이름이 없으면 "카페명 미입력"으로 설정
+    cafeName: reservation.cafeName || "카페명 미입력",
+
+    // 사업자번호가 없으면 "사업자번호 미입력"으로 설정
+    businessNumber: reservation.businessNumber || "사업자번호 미입력",
+
+    // 모델명이 없으면 "모델명 미입력"으로 설정
+    modelName: reservation.modelName || "모델명 미입력",
+
+    // 예상 금액이 없으면 "0"으로 설정
+    estimatedPrice: reservation.estimatedPrice || "0",
+    // 생성일이 없으면 현재 날짜와 시간으로 설정 (ISO 포맷, 'yyyy-mm-ddThh:mm')
+    createdAt: reservation.createdAt || new Date().toISOString().slice(0, 16),
+
+    // 희망 시간도 없으면 현재 날짜와 시간으로 설정 (ISO 포맷, 'yyyy-mm-ddThh:mm')
+    preferredDateTime:
+      reservation.preferredDateTime || new Date().toISOString().slice(0, 16),
+
+    // 사진이 없으면 기본 이미지 3개로 설정
+    photos: reservation.photos || [
+      "/images/ice_cream.jpg",
+      "/images/ice_cream2.jpg",
+      "/images/ice_cream3.png",
+    ], // 요구사항이 없으면 "요구사항 없음"으로 설정
+    requirements: reservation.requirements || "요구사항 없음",
+
+    // 메모가 없으면 "메모 없음"으로 설정
+    memo: reservation.memo || "메모 없음",
+
+    // 지정된 기사가 없으면 null로 설정 (아직 배정되지 않은 상태)
+    technician: reservation.technician || null,
+
+    // 이메일이 없으면 "이메일 미입력"으로 설정
+    email: reservation.email || "이메일 미입력",
+
+    // 특별 요청사항이 없으면 "특별 요청사항 없음"으로 설정
+    specialRequests: reservation.specialRequests || "특별 요청사항 없음",
+  };
+};
+// 모달창 닫기 함수
+const closeModal = () => {
+  selectedReservation.value = null;
+};
+// 기사 검색 모달 열기
+const openTechnicianSearchModal = () => {
+  showTechnicianSearchModal.value = true;
+};
+// 기사 검색 모달 닫기
+const closeTechnicianSearchModal = () => {
+  showTechnicianSearchModal.value = false; //모달 숨기기;
+};
+// 기사 검색 관련 상태
+const technicianSearchFilter = ref({
+  type: "all",
+  settlementRate: "all",
+  area: "all",
+  keyword: "",
+});
+// 기사 목록
+const technicians = ref([
+  {
+    id: 1,
+    name: "김기사",
+    type: "executive",
+    phone: "010-1111-2222",
+    settlementRate: 80,
+    area: "seoul",
+  },
+  {
+    id: 2,
+    name: "이기사",
+    type: "employee",
+    phone: "010-3333-4444",
+    settlementRate: 75,
+    area: "gyeonggi",
+  },
+  {
+    id: 3,
+    name: "박기사",
+    type: "executive",
+    phone: "010-5555-6666",
+    settlementRate: 85,
+    area: "incheon",
+  },
+  {
+    id: 4,
+    name: "최기사",
+    type: "employee",
+    phone: "010-7777-8888",
+    settlementRate: 70,
+    area: "busan",
+  },
+  {
+    id: 5,
+    name: "정기사",
+    type: "executive",
+    phone: "010-9999-0000",
+    settlementRate: 90,
+    area: "seoul",
+  },
+  {
+    id: 6,
+    name: "강기사",
+    type: "employee",
+    phone: "010-2222-3333",
+    settlementRate: 75,
+    area: "gyeonggi",
+  },
+  {
+    id: 7,
+    name: "조기사",
+    type: "executive",
+    phone: "010-4444-5555",
+    settlementRate: 80,
+    area: "incheon",
+  },
+  {
+    id: 8,
+    name: "윤기사",
+    type: "employee",
+    phone: "010-6666-7777",
+    settlementRate: 85,
+    area: "busan",
+  },
+  {
+    id: 9,
+    name: "장기사",
+    type: "executive",
+    phone: "010-8888-9999",
+    settlementRate: 70,
+    area: "seoul",
+  },
+  {
+    id: 10,
+    name: "임기사",
+    type: "employee",
+    phone: "010-0000-1111",
+    settlementRate: 90,
+    area: "gyeonggi",
+  },
+]);
+// 기사 페이지 네이션 관련 상태
+const currentTechnicianPage = ref(1);
+const techniciansPerPage = ref(5);
+const technicianSearch = ref("");
+// 필터릴된 기사 목록
+// computed로 필터링된 기사 리스크를 계산함
+const filteredTechnicians = computed(() => {
+  return technicians.value.filter((tech) => {
+    // 타입이(type)dl "all" 이면 모두 포함 ,아니면 선택한 타입과 같은 기사만 포함
+    const matchesType =
+      technicianSearchFilter.value.type === "all" ||
+      tech.type === technicianSearchFilter.value.type;
+    //정산비율이(settlementRate) "all"이면 모두 포함, 아니면 선택한 비율과 같은 기사만 포함
+    const matchesRate =
+      technicianSearchFilter.value.settlementRate === "all" ||
+      tech.settlementRate.toString() ===
+        technicianSearchFilter.value.settlementRate;
+    // 지역에 (area)"all"이면 모두 포삼, 아니면 선택한 지역과 같은 기사만 포함
+    const matchesArea =
+      technicianSearchFilter.value.area === "all" ||
+      tech.area === technicianSearchFilter.value.area;
+    // 키워드가 비어있으면 모두 포함 아니면 이름이나 전화번호에 키워드가 포함된 기사만 출력
+    const matchesKeyword =
+      !technicianSearchFilter.value.keyword || //키워드가 없으면 true
+      tech.name.includes(technicianSearchFilter.value.keyword) || //이름에 키워드 포함
+      tech.phone.includes(technicianSearchFilter.value.keyword); //전화번호에 키워드 포함
+    //  위 4가지 조건을 모두 만족하는 기사만 필터링해서 반환
+
+    return matchesType && matchesRate && matchesArea && matchesKeyword;
+  });
+});
+
+// 기사페이지네이션
+const totalTechnicianPages = computed(() => {
+  return Math.ceil(filteredTechnicians.value.length / techniciansPerPage.value);
+});
+// 현재 페이지에 보여줄 기사 목록
+const paginatedTechnicians = computed(() => {
+  // 시작인덱스
+  const start = (currentTechnicianPage.value - 1) * techniciansPerPage.value;
+
+  // 끝 인덱스
+  const end = start + techniciansPerPage.value;
+  return filteredTechnicians.value.slice(start, end);
+});
+//
+const gotoTechnicianPage = (page) => {
+  if (page >= 1 && page <= totalTechnicianPages.value)
+    currentTechnicianPage.value = page;
+};
+// 기사유형 텍스트 변환
+const getTechnicianTypeText = (type) => {
+  const typeMap = {
+    executive: "임원",
+    employee: "사원",
+  };
+  return typeMap[type] || type;
+};
+// 지역 텍스트 변화
+const getAreaText = (area) => {
+  const areaMap = {
+    seoul: "서울",
+    gyeonggi: "경기",
+    incheon: "인천",
+    busan: "부산",
+  };
+  return areaMap[area] || area;
+};
+// 기사 선택시 실행되는 함수
+const selectTechnician = (technician) => {
+  selectedReservation.value.technician = technician; //예약정보 선택한기사
+  technicianSearch.value = technician.name;
+  closeTechnicianSearchModal();
+};
+// 기사배정 저장 클릭시
+const saveTechnicianAssignment = () => {
+  if (!selectedReservation.value.technician) {
+    alert("담당 기사를 선택해주세요");
+    return;
+  }
+  // 기사배정 저장 로직
+  const index = reservations.value.findIndex(
+    (r) => r.id === selectedReservation.value.id
+  );
+  if (index !== -1) {
+    reservations.value[index].technician = selectedReservation.value.technician;
+    alert(`기사배정이 완료되었습니다.\n 배정된 기사: ${selectedReservation.value.technician.name} \n
+    예약번호 ${selectedReservation.value.id} \n 연락드리는 기사에게 예약 번호를 알려주세요. 곧 연락드리겠습니다.
+    `);
+  }
+  closeModal();
+};
+// 기사검색 한글이슈
+function handleInput1(event) {
+  technicianSearchFilter.value.keyword = event.target.value;
+}
+// 상세 옆 취소 확인모달창 보임 reservationToCancel을 활성화시킴
+const comfirmCancle = (reservation) => {
+  //  console.log(reservation);
+  showCancelModal.value = true;
+  reservationToCancel.value = reservation;
+};
+// 취소 관련
+// 예약을 취소값을 설정해 둠
+const reservationToCancel = ref(null);
+// 취소 확인모달창 에서 닫기 버튼
+const closeCancelModal = () => {
+  showCancelModal.value = false;
+  reservationToCancel.value = null;
+};
+// 취소 확인모달창 에서 실제로 취소완료되는 버튼
+const cancelReservation = () => {
+  // 기존에는 인덱스를 찾았으나
+  if (reservationToCancel.value) {
+    // 인덱스를 못찾으니 예약의 findIndex를 함
+    const index = reservations.value.findIndex(
+      (r) => r.id === reservationToCancel.value.id
+    );
+    // console.log(index);
+    // console.log(reservations.value[index].status);
+    // 해당예약이 목록에 존재하면 인덱스가 -1이 아니면
+    if (index !== -1) {
+      reservations.value[index].status = "cancelled";
+    }
+  }
+  closeCancelModal();
+};
 </script>
-<style scoped></style>
