@@ -19,7 +19,6 @@
           <router-link to="/seviceInfo">서비스 안내</router-link>
           <router-link to="/faq">FAQ</router-link>
           <router-link to="/contact">문의하기</router-link>
-          <router-link to="/a">a</router-link>
         </div>
         <div class="user-menu">
           <router-link to="/login" v-if="!isLoggedIn">로그인</router-link>

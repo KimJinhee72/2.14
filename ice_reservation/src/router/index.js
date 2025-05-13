@@ -11,7 +11,6 @@ import ModifyReservation from "@/views/ModifyReservation.vue";
 import SignUp from "@/views/SignUp.vue";
 import UserProflie from "@/views/UserProflie.vue";
 import FindPassword from "@/views/FindPassword.vue";
-import a from "@/views/a.vue";
 const routes = [
     {path :"/",name:"Home", component : Home},
     {path :"/login", name:"Login", component : Login },
@@ -26,7 +25,6 @@ const routes = [
     {path :"/modify-reservation/:id" , name:"ModifyReservation" , component :ModifyReservation, props: true,},
     {path :"/profile" , name:"UserProflie" , component :UserProflie, props: true,},
     {path :"/find-password" , name:"FindPassword" , component :FindPassword, props: true,},
-    {path :"/a" , name:"a" , component :a, props: true,},
 ]
 const router = createRouter({
     history: createWebHistory(),
