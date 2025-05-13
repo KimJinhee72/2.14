@@ -30,9 +30,9 @@
     </div>
     <!-- 통계카드 -->
     <!-- lg:1024px 이상 / md:768px이상 /sm:640px 이상 -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       <div
-        class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-4 md:p-6">
+        class=" bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-4 md:p-6">
         <div class="flex items-center">
           <div class="p-3 rounded-full bg-blue-100 text-blue-600">
             <i class="fas fa-tasks text-xl md:text-2xl"></i>
